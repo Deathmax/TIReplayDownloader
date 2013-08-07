@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIReplayDownloader", "TIReplayDownloader\TIReplayDownloader.csproj", "{A7AE2719-0696-4214-B414-02AB6CFBA2C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplayPlayer", "ReplayPlayer\ReplayPlayer.csproj", "{32D580A7-D737-4510-B131-383D21440384}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1326D8DB-659B-435B-BE3A-689823054571}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7AE2719-0696-4214-B414-02AB6CFBA2C4}.Debug|x86.ActiveCfg = Debug|x86
+		{A7AE2719-0696-4214-B414-02AB6CFBA2C4}.Debug|x86.Build.0 = Debug|x86
+		{A7AE2719-0696-4214-B414-02AB6CFBA2C4}.Release|x86.ActiveCfg = Release|x86
+		{A7AE2719-0696-4214-B414-02AB6CFBA2C4}.Release|x86.Build.0 = Release|x86
+		{32D580A7-D737-4510-B131-383D21440384}.Debug|x86.ActiveCfg = Debug|x86
+		{32D580A7-D737-4510-B131-383D21440384}.Debug|x86.Build.0 = Debug|x86
+		{32D580A7-D737-4510-B131-383D21440384}.Release|x86.ActiveCfg = Release|x86
+		{32D580A7-D737-4510-B131-383D21440384}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
