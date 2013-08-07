@@ -107,11 +107,33 @@ namespace TIReplayDownloader
             FormatStrings.Add("Grand Championship 4/5", "#");
             FormatStrings.Add("Grand Championship 5/5", "#");
 
+            Deserialize();
+
             Render();
+        }
+
+        private static void Deserialize()
+        {
+            if (!File.Exists("htmldict.txt")) return;
+            var data = File.ReadAllLines("htmldict.txt");
+            foreach (var split in data.Select(line => line.Split('|')))
+            {
+                FormatStrings[split[0]] = split[1];
+            }
+        }
+
+        private static void Serialize()
+        {
+            if (File.Exists("htmldict.txt")) File.Delete("htmldict.txt");
+            foreach (var pair in FormatStrings)
+            {
+                File.AppendAllText("htmldict.txt", pair.Key + "|" + pair.Value + "\n");
+            }
         }
 
         public static void Render()
         {
+            Serialize();
             var template = CleanTemplate(File.ReadAllText("indextemplate.html"));
             var array = new string[70];
             int i = 0;
