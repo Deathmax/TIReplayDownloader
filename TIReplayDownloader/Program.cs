@@ -40,6 +40,7 @@ namespace TIReplayDownloader
             ScheduleURL = args[1];
             CompressSeries = args[2] == "compressseries";
             ConsoleExt.Start();
+            HTMLRender.Initialize();
             var downloaded = File.ReadAllLines("downloaded.txt");
             Mega = new Mega();
             foreach (var line in downloaded)
@@ -238,6 +239,8 @@ namespace TIReplayDownloader
                                                                                    demo.TeamA, demo.TeamB, "dota2://matchid=" + demo.MatchID,
                                                                                    "playdemo \"" + @"replays\" + "TI3 - " +
                                                                                    demo.Series + @"\" + Path.GetFileNameWithoutExtension(demoname) + "\""));
+                                                            AddHTML(demo);
+                                                            HTMLRender.Render();
                                                             if (Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series))
                                                                 .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames 
                                                                 && !File.Exists(Path.Combine(SaveDirectory, "TI3 - " + demo.Series + ".zip")))
@@ -264,6 +267,7 @@ namespace TIReplayDownloader
                 }
             }
         }
+
 
         static Demo DownloadDemoId(string matchdata, string series)
         {
@@ -436,12 +440,24 @@ namespace TIReplayDownloader
             ConsoleExt.Log("Uploaded {0}.", Path.GetFileName(file));
         }
 
-        public static string Encode(byte[] data)
+        static string Encode(byte[] data)
         {
             return Convert.ToBase64String(data)
                 .Replace('+', '-')
                 .Replace('/', '_')
                 .TrimEnd(new char[] { '=' });
+        }
+
+        //TODO: Save all main event demo info to add back into HTML, or save the dict.
+        static void AddHTML(Demo demo)
+        {
+            foreach (var pair in HTMLRender.FormatStrings)
+            {
+                if (pair.Key.ToLower() == demo.Series.ToLower())
+                    HTMLRender.FormatStrings[pair.Key] = demo.TeamA + " vs " + demo.TeamB;
+                if (pair.Key.ToLower().StartsWith(demo.Description.ToLower()))
+                    HTMLRender.FormatStrings[pair.Key] = "dota2://matchid=" + demo.MatchID;
+            }
         }
 
         static void AddFolderToZip(ZipFile f, string root, string folder)
