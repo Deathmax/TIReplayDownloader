@@ -411,9 +411,13 @@ namespace TIReplayDownloader
                 nodetouse = node;
             }
             var uploadnode = Mega2.UploadFileSync(nodetouse.Id, file);
+            uploadnode.Attributes.Name = Path.GetFileName(file);
+            Mega2.UpdateNodeAttrSync(uploadnode);
             File.AppendAllText(Path.Combine(SaveDirectory, "upload.txt"),
                                string.Format("{0} - {1}\r\n", Path.GetFileName(file),
                                              Mega.get_link(uploadnode.Id, Encode(uploadnode.NodeKey.DecryptedKey))));
+            #region MegaLibrary implementation
+            //Not using as will throw an exception on Mono
             /*var nodes = Mega.retrieve_nodes();
             Node nodetouse = null;
             foreach (var node in nodes.Where(node => node.attributes.name == "TI3 Replays"))
@@ -428,6 +432,7 @@ namespace TIReplayDownloader
             File.AppendAllText(Path.Combine(SaveDirectory, "upload.txt"),
                                string.Format("{0} - {1}\r\n", Path.GetFileName(file),
                                              Mega.get_link(uploadnode.identifier, uploadnode.key)));*/
+            #endregion
             ConsoleExt.Log("Uploaded {0}.", Path.GetFileName(file));
         }
 
