@@ -99,8 +99,11 @@ namespace TIReplayDownloader
                 }
                 foreach (var pair in MatchIDList)
                 {
-                    foreach (var game in pair.Value)
-                        DownloadDemoId(game, pair.Key);
+                    for (int i = 0; i < pair.Value.Count; i++)
+                    {
+                        var game = pair.Value[i];
+                        DownloadDemoId(game, pair.Key, ((i + 1) == pair.Value.Count));
+                    }
                 }
             }
             ConsoleExt.Log("Done.");
@@ -167,8 +170,9 @@ namespace TIReplayDownloader
                                           {Description = DescriptionRegex.Match(response).Groups[1].Captures[0].Value};
                             if (dem.Description.Contains("3/3") || dem.Description.Contains("4/5") || dem.Description.Contains("5/5"))
                             {
-                                File.AppendAllText("uploadlist.txt", dem.Series + "\r\n");
-                                ConsoleExt.Log("{0} was not played.", matchnum);
+                                //File.AppendAllText("uploadlist.txt", dem.Series + "\r\n");
+                                ConsoleExt.Log("{0} was not played, compressing series.", matchnum);
+                                Compress(dem.Series);
                                 return new Demo();
                             }
                             ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
@@ -282,7 +286,7 @@ namespace TIReplayDownloader
             }
         }
 
-        static Demo DownloadDemoId(string matchdata, string series)
+        static Demo DownloadDemoId(string matchdata, string series, bool compress = false)
         {
             using (var wc = new WebClient { Proxy = null })
             {
@@ -344,6 +348,8 @@ namespace TIReplayDownloader
                                                                                demo.Series + @"\" +
                                                                                Path.GetFileNameWithoutExtension(demoname) +
                                                                                "\""));
+                                                        if (compress)
+                                                            Compress(demo.Series);
                                                     }
                                                     catch (Exception ex)
                                                     {
@@ -352,13 +358,14 @@ namespace TIReplayDownloader
                                                 };
                 Directory.CreateDirectory(Path.Combine(SaveDirectory, demo.Series));
                 Downloads++;
+                ConsoleExt.AddProgressBar(progressbar);
                 wc.DownloadFileAsync(new Uri(demourl), Path.Combine(SaveDirectory, demo.Series, demoname));
                 demo.Path = Path.Combine(SaveDirectory, demo.Series, demoname);
                 return demo;
             }
         }
 
-        static void Decompress(string srcfile, ProgressBar bar)
+        static void Decompress(string srcfile, ProgressBar bar = null)
         {
             if (bar == null) ConsoleExt.Log("Decompressing {0}.", Path.GetFileName(srcfile));
             bar.Message = string.Format("Decompressing {0}.", Path.GetFileName(srcfile));
@@ -384,19 +391,25 @@ namespace TIReplayDownloader
             File.Delete(srcfile);
         }
 
-        static void Compress(string series)
+        static void Compress(string series, ProgressBar bar = null)
         {
             if (!CompressSeries) return;
+            if (bar != null) bar.Message = string.Format("Compressing {0}.", series);
             ConsoleExt.Log("Compressing {0}.", series);
-            var fsOut = File.Create(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
+            var file = "";
+            file = Directory.Exists(Path.Combine(SaveDirectory, "TI3 - " + series))
+                       ? Path.Combine(SaveDirectory, "TI3 - " + series)
+                       : Path.Combine(SaveDirectory, series);
+            var fsOut = File.Create(file + ".zip");
             var zipfile = ZipFile.Create(fsOut);
             zipfile.BeginUpdate();
-            AddFolderToZip(zipfile, SaveDirectory, Path.Combine(SaveDirectory, "TI3 - " + series));
+            AddFolderToZip(zipfile, SaveDirectory, file);
             zipfile.CommitUpdate();
             zipfile.Close();
             fsOut.Close();
+            if (bar != null) bar.Message = string.Format("Compressed {0}.", series);
             ConsoleExt.Log("Compressed {0}.", series);
-            Upload(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
+            Upload(file + ".zip");
         }
 
         static void Upload(object file)
