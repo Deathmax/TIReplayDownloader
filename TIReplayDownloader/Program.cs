@@ -161,16 +161,21 @@ namespace TIReplayDownloader
                     var response = wc.DownloadString("http://www.dota2.com/international/game/" + matchnum);
                     if (response.Contains("This game was not played."))
                     {
-                        if (ScheduleURL.Contains("mainevent") && DescriptionRegex.Match(response).Groups[1].Captures[0].Value.Contains("3/3"))
+                        if (ScheduleURL.Contains("mainevent"))
                         {
-                            ConsoleExt.Log("{0} was not played.", matchnum);
-                            return new Demo();
-                        }
-                        else
-                        {
+                            var dem = new Demo
+                                          {Description = DescriptionRegex.Match(response).Groups[1].Captures[0].Value};
+                            if (dem.Description.Contains("3/3") || dem.Description.Contains("4/5") || dem.Description.Contains("5/5"))
+                            {
+                                File.AppendAllText("downloaded.txt", (matchnum + 5000) + "\r\n");
+                                ConsoleExt.Log("{0} was not played.", matchnum);
+                                return new Demo();
+                            }
                             ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
                             return null;
                         }
+                        ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
+                        return null;
                     }
                     var demo = new Demo
                                    {
@@ -249,8 +254,10 @@ namespace TIReplayDownloader
                                                                                    demo.Series + @"\" + Path.GetFileNameWithoutExtension(demoname) + "\""));
                                                             AddHTML(demo);
                                                             HTMLRender.Render();
-                                                            if (Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series))
-                                                                .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames 
+                                                            if ((Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series))
+                                                                .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames ||
+                                                                // Magic numbers, this means the game after this was not played.
+                                                                (File.ReadAllText("downloaded.txt").Contains((matchnum + 5001).ToString()))) 
                                                                 && !File.Exists(Path.Combine(SaveDirectory, "TI3 - " + demo.Series + ".zip")))
                                                             {
                                                                 Compress(demo.Series);
@@ -390,8 +397,7 @@ namespace TIReplayDownloader
             zipfile.Close();
             fsOut.Close();
             ConsoleExt.Log("Compressed {0}.", series);
-            if (File.ReadAllText("uploadlist.txt").Contains(series))
-                Upload(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
+            Upload(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
         }
 
         static void Upload(object file)
