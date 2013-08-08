@@ -119,7 +119,7 @@ namespace TIReplayDownloader
                         {
                             foreach (var line in File.ReadAllLines("uploadlist.txt"))
                             {
-                                Upload(line);
+                                Compress(line);
                             }
                             File.Delete("uploadlist.txt");
                         }
