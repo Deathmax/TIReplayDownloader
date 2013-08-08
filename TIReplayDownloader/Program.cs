@@ -153,8 +153,16 @@ namespace TIReplayDownloader
                     var response = wc.DownloadString("http://www.dota2.com/international/game/" + matchnum);
                     if (response.Contains("This game was not played."))
                     {
-                        ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
-                        return null;
+                        if (ScheduleURL.Contains("mainevent"))
+                        {
+                            ConsoleExt.Log("{0} was not played.", matchnum);
+                            return new Demo();
+                        }
+                        else
+                        {
+                            ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
+                            return null;
+                        }
                     }
                     var demo = new Demo
                                    {
@@ -214,7 +222,7 @@ namespace TIReplayDownloader
                                                             else
                                                                 ConsoleExt.Log(
                                                                     "Downloading of {0} failed. Reason: {1}", matchnum,
-                                                                    args.Cancelled ? "Cancelled" : args.Error.Message);
+                                                                    args.Cancelled ? "Cancelled" : args.Error.ToString());
                                                             DemoList.Remove(matchnum);
                                                             return;
                                                         }
@@ -254,7 +262,7 @@ namespace TIReplayDownloader
                 }
                 catch (Exception ex)
                 {
-                    ConsoleExt.Log("Download of {0} failed. Exception: {1}", matchnum, ex.Message);
+                    ConsoleExt.Log("Download of {0} failed. Exception: {1}", matchnum, ex);
                     return null;
                 }
             }
@@ -428,12 +436,15 @@ namespace TIReplayDownloader
         //TODO: Save all main event demo info to add back into HTML, or save the dict.
         static void AddHTML(Demo demo)
         {
-            foreach (var pair in HTMLRender.FormatStrings)
+            lock (HTMLRender.FormatStrings)
             {
-                if (pair.Key.ToLower() == demo.Series.ToLower())
-                    HTMLRender.FormatStrings[pair.Key] = demo.TeamA + " vs " + demo.TeamB;
-                if (pair.Key.ToLower().StartsWith(demo.Description.ToLower()))
-                    HTMLRender.FormatStrings[pair.Key] = "dota2://matchid=" + demo.MatchID;
+                foreach (var key in HTMLRender.FormatStrings.Keys.ToList())
+                {
+                    if (key.ToLower() == demo.Series.ToLower())
+                        HTMLRender.FormatStrings[key] = demo.TeamA + " vs " + demo.TeamB;
+                    if (key.ToLower().StartsWith(demo.Description.ToLower()))
+                        HTMLRender.FormatStrings[key] = "dota2://matchid=" + demo.MatchID;
+                }
             }
         }
 

@@ -87,7 +87,7 @@ namespace TIReplayDownloader
                 //Console.CursorLeft = 0;
                 var barwidth = (int) (((width - 1)*progressbar.Progress)/100d);
                 var barstring = new string('\u2592', barwidth) + new string(' ', width - barwidth - 1);
-                Console.Write("\r[{0}]", barstring);
+                Console.Write("\r[{0}]\n", barstring);
                 _barRows++;
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write((string.Join("", progressbar.Message.Take(width + 1))).PadRight(width + 1) + "\r");

@@ -116,18 +116,24 @@ namespace TIReplayDownloader
         {
             if (!File.Exists("htmldict.txt")) return;
             var data = File.ReadAllLines("htmldict.txt");
-            foreach (var split in data.Select(line => line.Split('|')))
+            lock (FormatStrings)
             {
-                FormatStrings[split[0]] = split[1];
+                foreach (var split in data.Select(line => line.Split('|')))
+                {
+                    FormatStrings[split[0]] = split[1];
+                }
             }
         }
 
         private static void Serialize()
         {
             if (File.Exists("htmldict.txt")) File.Delete("htmldict.txt");
-            foreach (var pair in FormatStrings)
+            lock (FormatStrings)
             {
-                File.AppendAllText("htmldict.txt", pair.Key + "|" + pair.Value + "\n");
+                foreach (var pair in FormatStrings)
+                {
+                    File.AppendAllText("htmldict.txt", pair.Key + "|" + pair.Value + "\n");
+                }
             }
         }
 
@@ -137,10 +143,13 @@ namespace TIReplayDownloader
             var template = CleanTemplate(File.ReadAllText("indextemplate.html"));
             var array = new string[70];
             int i = 0;
-            foreach (var str in FormatStrings)
+            lock (FormatStrings)
             {
-                array[i] = str.Value;
-                i++;
+                foreach (var str in FormatStrings)
+                {
+                    array[i] = str.Value;
+                    i++;
+                }
             }
             template = string.Format(template, array);
             File.WriteAllText("index.html", template);
