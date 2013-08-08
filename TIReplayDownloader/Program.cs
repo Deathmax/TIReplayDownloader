@@ -57,6 +57,7 @@ namespace TIReplayDownloader
                                                                       {
                                                                           ConsoleExt.Log("Logged into Mega.");
                                                                           Mega2 = a;
+                                                                          Mega.sid2 = a.User.Sid;
                                                                       }), (a =>
                                                                                {
                                                                                    ConsoleExt.Log(
@@ -64,17 +65,6 @@ namespace TIReplayDownloader
                                                                                        a);
                                                                                    Mega2 = null;
                                                                                }));
-                /*try
-                {
-                    Mega.login_user(account[0], account[1]);
-                    ConsoleExt.Log("Logged into Mega. (hopefully)");
-                }
-                catch (Exception ex)
-                {
-                    ConsoleExt.Log("Mega login failed. Exiting.");
-                    ConsoleExt.Log("{0}", ex);
-                    return;
-                }*/
             }
             if (!File.Exists("matchiddownload.txt"))
             {
@@ -196,6 +186,8 @@ namespace TIReplayDownloader
                                                demo.TeamA, demo.TeamB, "dota2://matchid=" + demo.MatchID,
                                                "playdemo \"" + @"replays\" + "TI3 - " +
                                                demo.Series + @"\" + Path.GetFileNameWithoutExtension(demoname) + "\""));
+                        AddHTML(demo);
+                        HTMLRender.Render();
                         return demo;
                     }
                     ConsoleExt.Log("Downloading {0}.", demourl);
@@ -267,7 +259,6 @@ namespace TIReplayDownloader
                 }
             }
         }
-
 
         static Demo DownloadDemoId(string matchdata, string series)
         {
