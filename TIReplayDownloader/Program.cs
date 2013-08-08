@@ -161,7 +161,7 @@ namespace TIReplayDownloader
                     var response = wc.DownloadString("http://www.dota2.com/international/game/" + matchnum);
                     if (response.Contains("This game was not played."))
                     {
-                        if (ScheduleURL.Contains("mainevent"))
+                        if (ScheduleURL.Contains("mainevent") && DescriptionRegex.Match(response).Groups[1].Captures[0].Value.Contains("3/3"))
                         {
                             ConsoleExt.Log("{0} was not played.", matchnum);
                             return new Demo();
@@ -451,7 +451,7 @@ namespace TIReplayDownloader
                 {
                     if (key.ToLower() == demo.Series.ToLower())
                         HTMLRender.FormatStrings[key] = demo.TeamA + " vs " + demo.TeamB;
-                    if (key.ToLower().StartsWith(demo.Description.ToLower()))
+                    if (key.ToLower().StartsWith(demo.Description.ToLower()) && !HTMLRender.FormatStrings[key].Contains("vs"))
                         HTMLRender.FormatStrings[key] = "dota2://matchid=" + demo.MatchID;
                 }
             }
