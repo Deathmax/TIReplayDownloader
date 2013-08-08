@@ -12,6 +12,37 @@ namespace TIReplayDownloader
         private static readonly List<ProgressBar> _progressBars = new List<ProgressBar>();
         private static int _barRows;
 
+        public static void TestRender()
+        {
+            var i = 0;
+            var bar = new ProgressBar();
+            _progressBars.Add(bar);
+            while (true)
+            {
+                if (i <= 100)
+                {
+                    bar.Progress = i;
+                    bar.Message = "Test Message Left".PadRight(Console.WindowWidth);
+                    var num = string.Format("{0} %", i);
+                    bar.Message = bar.Message.Insert(bar.Message.Length - num.Length, num);
+                }
+                if (i > 100)
+                {
+                    bar.Message = "Done. Destroying Soon.";
+                }
+                if (i > 105)
+                {
+                    bar.Destroy = true;
+                    bar.Message = "Destroying.";
+                    return;
+                }
+                for (int h = 0; h < new Random().Next(1, 5); h++ )
+                    ConsoleExt.Log("Testing {0}:{1}", i, h);
+                i++;
+                Thread.Sleep(500);
+            }
+        }
+
         public static void Log(string format, params object[] param)
         {
             Log(String.Format(format, param));
@@ -79,7 +110,7 @@ namespace TIReplayDownloader
                 }
                 if (i == 0)
                 {
-                    Console.Write(new string('-', width + 1));
+                    Console.Write(new string('-', width + 1) + ((Type.GetType("Mono.Runtime") != null) ? "\n" : ""));
                     _barRows++;
                 }
                 Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -87,10 +118,11 @@ namespace TIReplayDownloader
                 //Console.CursorLeft = 0;
                 var barwidth = (int) (((width - 1)*progressbar.Progress)/100d);
                 var barstring = new string('\u2592', barwidth) + new string(' ', width - barwidth - 1);
-                Console.Write("\r[{0}]\n", barstring);
+                Console.Write("\r[{0}]" + ((Type.GetType("Mono.Runtime") != null) ? "\n" : ""), barstring);
                 _barRows++;
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write((string.Join("", progressbar.Message.Take(width + 1))).PadRight(width + 1) + "\r");
+                Console.Write((string.Join("", progressbar.Message.Take(width + 1))).PadRight(width + 1) + "\r" +
+                              ((Type.GetType("Mono.Runtime") != null) ? "\n" : ""));
                 _barRows++;
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.BackgroundColor = ConsoleColor.Black;
