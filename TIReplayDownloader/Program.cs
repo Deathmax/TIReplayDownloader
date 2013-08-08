@@ -384,20 +384,6 @@ namespace TIReplayDownloader
 
         static void Upload(string file)
         {
-            var account = File.ReadAllLines("megaaccount.txt");
-            ConsoleExt.Log("Logging into Mega.");
-            Mega2.Init(new MegaUser(account[0], account[1]), (a =>
-            {
-                ConsoleExt.Log("Logged into Mega.");
-                Mega2 = a;
-            }), (a =>
-            {
-                ConsoleExt.Log(
-                    "Failed to log into Mega. Error code: {0}",
-                    a);
-                Mega2 = null;
-            }));
-            while (Mega2 == null) Thread.Sleep(100);
             ConsoleExt.Log("Uploading {0}.", file);
             var nodes = Mega2.GetNodesSync();
             MegaNode nodetouse = null;
