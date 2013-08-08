@@ -167,7 +167,7 @@ namespace TIReplayDownloader
                                           {Description = DescriptionRegex.Match(response).Groups[1].Captures[0].Value};
                             if (dem.Description.Contains("3/3") || dem.Description.Contains("4/5") || dem.Description.Contains("5/5"))
                             {
-                                File.AppendAllText("downloaded.txt", (matchnum + 5000) + "\r\n");
+                                File.AppendAllText("uploadlist.txt", dem.Series + "\r\n");
                                 ConsoleExt.Log("{0} was not played.", matchnum);
                                 return new Demo();
                             }
@@ -255,11 +255,10 @@ namespace TIReplayDownloader
                                                             AddHTML(demo);
                                                             HTMLRender.Render();
                                                             if ((Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series))
-                                                                .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames ||
-                                                                // Magic numbers, this means the game after this was not played.
-                                                                (File.ReadAllText("downloaded.txt").Contains((matchnum + 5001).ToString()))) 
+                                                                .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames) 
                                                                 && !File.Exists(Path.Combine(SaveDirectory, "TI3 - " + demo.Series + ".zip")))
                                                             {
+                                                                ConsoleExt.Log("Starting compression and upload of {0}.", matchnum);
                                                                 Compress(demo.Series);
                                                             }
                                                         }
@@ -448,7 +447,6 @@ namespace TIReplayDownloader
                 .TrimEnd(new char[] { '=' });
         }
 
-        //TODO: Save all main event demo info to add back into HTML, or save the dict.
         static void AddHTML(Demo demo)
         {
             lock (HTMLRender.FormatStrings)
