@@ -115,6 +115,14 @@ namespace TIReplayDownloader
                 {
                     try
                     {
+                        if (File.Exists("uploadlist.txt"))
+                        {
+                            foreach (var line in File.ReadAllLines("uploadlist.txt"))
+                            {
+                                Upload(line);
+                            }
+                            File.Delete("uploadlist.txt");
+                        }
                         var response = wc.DownloadString(ScheduleURL);
                         var matches = MatchNumberRegex.Matches(response);
                         ConsoleExt.Log("Schedule found {0} matches.", matches.Count);
@@ -177,7 +185,7 @@ namespace TIReplayDownloader
                     else if (demo.Series.StartsWith("UB"))
                         demo.NumberOfGames = 3;
                     else if (demo.Series.StartsWith("LB"))
-                        demo.NumberOfGames = demo.Game.Contains("/") ? 2 : 1;
+                        demo.NumberOfGames = demo.Game.Contains("/") ? 3 : 1;
                     else if (demo.Series.StartsWith("Grand"))
                         demo.NumberOfGames = 5;
                     var demoresponse = wc.DownloadString("https://rjackson.me/tools/matchurls?matchid=" + demo.MatchID);
@@ -382,7 +390,8 @@ namespace TIReplayDownloader
             zipfile.Close();
             fsOut.Close();
             ConsoleExt.Log("Compressed {0}.", series);
-            Upload(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
+            if (File.ReadAllText("uploadlist.txt").Contains(series))
+                Upload(Path.Combine(SaveDirectory, "TI3 - " + series + ".zip"));
         }
 
         static void Upload(object file)
