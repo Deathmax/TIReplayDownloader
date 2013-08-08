@@ -62,7 +62,7 @@ namespace TIReplayDownloader
                                                        message.PadRight((width + 1)*
                                                                         (int)
                                                                         Math.Ceiling((double) message.Length/width)));
-                Console.Write(writemessage);
+                Console.Write(writemessage + ((Type.GetType("Mono.Runtime") != null) ? "\n" : ""));
                 _messages.Clear();
             }
             for (int i = 0; i < _progressBars.Count; i++)
