@@ -139,6 +139,7 @@ namespace TIReplayDownloader
 
         public static void Render()
         {
+            ConsoleExt.Log("Starting HTML render.");
             Serialize();
             var template = CleanTemplate(File.ReadAllText("indextemplate.html"));
             var array = new string[70];
