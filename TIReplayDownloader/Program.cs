@@ -265,11 +265,11 @@ namespace TIReplayDownloader
                                                                                    demo.Series + @"\" + Path.GetFileNameWithoutExtension(demoname) + "\""));
                                                             AddHTML(demo);
                                                             HTMLRender.Render();
-                                                            if ((Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series))
-                                                                .Count(file => Path.GetExtension(path) == ".dem") >= demo.NumberOfGames) 
+                                                            if (Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series)).Count(s => Path.GetExtension(s) == ".dem") >= demo.NumberOfGames
                                                                 && !File.Exists(Path.Combine(SaveDirectory, "TI3 - " + demo.Series + ".zip")))
                                                             {
-                                                                ConsoleExt.Log("Starting compression and upload of {0}.", matchnum);
+                                                                ConsoleExt.Log(
+                                                                    "Starting compression and upload of {0}.", matchnum);
                                                                 Compress(demo.Series);
                                                             }
                                                             else
