@@ -412,6 +412,12 @@ namespace TIReplayDownloader
             file = Directory.Exists(Path.Combine(SaveDirectory, "TI3 - " + series))
                        ? Path.Combine(SaveDirectory, "TI3 - " + series)
                        : Path.Combine(SaveDirectory, series);
+            if (File.Exists(file + ".zip"))
+            {
+                if (bar != null) bar.Message = "Zip already exists!";
+                ConsoleExt.Log("{0} already exists!", file + ".zip");
+                return;
+            }
             var fsOut = File.Create(file + ".zip");
             var zipfile = ZipFile.Create(fsOut);
             zipfile.BeginUpdate();
