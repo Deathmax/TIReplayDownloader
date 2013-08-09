@@ -171,8 +171,12 @@ namespace TIReplayDownloader
                             if (dem.Description.Contains("3/3") || dem.Description.Contains("4/5") || dem.Description.Contains("5/5"))
                             {
                                 //File.AppendAllText("uploadlist.txt", dem.Series + "\r\n");
-                                ConsoleExt.Log("{0} was not played, compressing series.", matchnum);
-                                Compress(dem.Series);
+                                if (!File.Exists(Path.Combine(SaveDirectory, "TI3 - " + dem.Series + ".zip")))
+                                {
+                                    File.AppendAllText("downloaded.txt", matchnum + "\r\n");
+                                    ConsoleExt.Log("{0} was not played, compressing series.", matchnum);
+                                    Compress(dem.Series);
+                                }
                                 return new Demo();
                             }
                             ConsoleExt.Log("{0} is not uploaded yet.", matchnum);
@@ -234,10 +238,13 @@ namespace TIReplayDownloader
                                                         Downloads--;
                                                         if (args.Cancelled || args.Error != null)
                                                         {
+                                                            progressbar.Destroy = true;
                                                             if (args.Error.Message.Contains("404"))
-                                                                ConsoleExt.Log("{0}'s demo file is pending upload.");
+                                                            {
+                                                                progressbar.Message = string.Format("{0}'s demo file is pending upload.", matchnum);
+                                                            }
                                                             else
-                                                                ConsoleExt.Log(
+                                                                progressbar.Message = string.Format(
                                                                     "Downloading of {0} failed. Reason: {1}", matchnum,
                                                                     args.Cancelled ? "Cancelled" : args.Error.ToString());
                                                             DemoList.Remove(matchnum);
@@ -265,9 +272,14 @@ namespace TIReplayDownloader
                                                                 ConsoleExt.Log("Starting compression and upload of {0}.", matchnum);
                                                                 Compress(demo.Series);
                                                             }
+                                                            else
+                                                            {
+                                                                progressbar.Destroy = true;
+                                                            }
                                                         }
                                                         catch (Exception ex)
                                                         {
+                                                            progressbar.Destroy = true;
                                                             ConsoleExt.Log("Exception occured finalizing file: {0}", ex.Message);
                                                         }
                                                     };
