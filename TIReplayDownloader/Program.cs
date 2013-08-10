@@ -198,7 +198,7 @@ namespace TIReplayDownloader
                     else if (demo.Series.StartsWith("UB"))
                         demo.NumberOfGames = 3;
                     else if (demo.Series.StartsWith("LB"))
-                        demo.NumberOfGames = demo.Game.Contains("/") ? 3 : 1;
+                        demo.NumberOfGames = demo.Game.Contains("/3") ? 3 : 1;
                     else if (demo.Series.StartsWith("Grand"))
                         demo.NumberOfGames = 5;
                     var demoresponse = wc.DownloadString("https://rjackson.me/tools/matchurls?matchid=" + demo.MatchID);
@@ -265,6 +265,10 @@ namespace TIReplayDownloader
                                                                                    demo.Series + @"\" + Path.GetFileNameWithoutExtension(demoname) + "\""));
                                                             AddHTML(demo);
                                                             HTMLRender.Render();
+                                                            ConsoleExt.Log("DEBUG: {0} has {1} files ,{2} .dem files, {3} number of games.",
+                                                                demo.Description, Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series)).Count(),
+                                                                Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series)).Count(s => Path.GetExtension(s) == ".dem"),
+                                                                demo.NumberOfGames);
                                                             if (Directory.GetFiles(Path.Combine(SaveDirectory, "TI3 - " + demo.Series)).Count(s => Path.GetExtension(s) == ".dem") >= demo.NumberOfGames
                                                                 && !File.Exists(Path.Combine(SaveDirectory, "TI3 - " + demo.Series + ".zip")))
                                                             {
